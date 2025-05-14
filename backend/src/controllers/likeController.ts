@@ -2,11 +2,13 @@ import { RequestHandler } from "express";
 import mongoose from "mongoose";
 import Product from "../models/Product";
 import { clearCache } from "../services/redisService";
+import i18next from "i18next";
 
 export const toggleLike: RequestHandler = async (req, res) => {
   try {
     const productId = req.params.id;
     const userId = req.user.id;
+    const language = req.language || "en";
 
     // Validate product ID
     if (!mongoose.Types.ObjectId.isValid(productId)) {
@@ -18,7 +20,7 @@ export const toggleLike: RequestHandler = async (req, res) => {
     const product = await Product.findById(productId);
 
     if (!product) {
-      res.status(404).json({ message: "Product not found" });
+      res.status(404).json({ message: i18next.t("productNotFound") });
       return;
     }
 
@@ -26,7 +28,7 @@ export const toggleLike: RequestHandler = async (req, res) => {
     const alreadyLiked = product.likedBy.some((id) => id.toString() === userId);
 
     let update;
-    let message;
+    let messageKey;
 
     if (alreadyLiked) {
       // Unlike: Remove user ID from likedBy array and decrement likes count
@@ -34,15 +36,17 @@ export const toggleLike: RequestHandler = async (req, res) => {
         $pull: { likedBy: userId },
         $inc: { likes: -1 },
       };
-      message = "Product unliked successfully";
+      messageKey = "productUnliked";
     } else {
       // Like: Add user ID to likedBy array and increment likes count
       update = {
         $addToSet: { likedBy: userId },
         $inc: { likes: 1 },
       };
-      message = "Product liked successfully";
-    } // Update the product
+      messageKey = "productLiked";
+    }
+
+    // Update the product
     const updatedProduct = await Product.findByIdAndUpdate(productId, update, {
       new: true,
     });
@@ -50,11 +54,33 @@ export const toggleLike: RequestHandler = async (req, res) => {
     // Invalidate products cache after toggling like/unlike
     await clearCache("products:*");
 
+    // Format response based on language preference
+    if (!updatedProduct) {
+      res.status(404).json({ message: i18next.t("productNotFound") });
+      return;
+    }
+
+    const formattedProduct = {
+      id: updatedProduct._id,
+      name: updatedProduct.name[language],
+      price: updatedProduct.price,
+      category: updatedProduct.category[language],
+      subcategory: updatedProduct.subcategory[language],
+      likes: updatedProduct.likes,
+      likedBy: updatedProduct.likedBy,
+    };
+
     res.status(200).json({
-      message,
-      product: updatedProduct,
+      message:
+        messageKey === "productLiked"
+          ? i18next.t("productLiked")
+          : i18next.t("productUnliked"),
+      product: formattedProduct,
+      language,
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+    res
+      .status(500)
+      .json({ message: i18next.t("serverError"), error: String(error) });
   }
 };

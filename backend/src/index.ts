@@ -5,6 +5,9 @@ import mongoose, { ConnectOptions } from "mongoose";
 import authRoutes from "./routes/authRoutes";
 import productRoutes from "./routes/productRoutes";
 import { connectRedis, redisClient } from "./services/redisService";
+import initI18n from "./utils/i18n";
+import { i18nMiddleware } from "./middleware/i18nMiddleware";
+import i18next from 'i18next';
 
 // Load environment variables
 dotenv.config();
@@ -18,9 +21,17 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Initialize i18n
+const i18n = initI18n();
+app.use(i18nMiddleware);
+
 // Simple route for testing
 app.get("/", (req: Request, res: Response) => {
-  res.json({ message: "Welcome to Product Catalog API" });
+  const language = req.language || 'en';
+  res.json({ 
+    message: i18next.t("welcome"),
+    language
+  });
 });
 
 // Use auth routes

@@ -1,0 +1,10 @@
+{
+  "welcome": "Welcome to Product Catalog API",
+  "productNotFound": "Product not found",
+  "productCreated": "Product created successfully",
+  "serverError": "Server error",
+  "allFieldsRequired": "All fields are required",
+  "priceValidation": "Price must be a positive number",
+  "productLiked": "Product liked successfully",
+  "productUnliked": "Product unliked successfully"
+}

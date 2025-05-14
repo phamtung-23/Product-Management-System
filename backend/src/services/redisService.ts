@@ -25,18 +25,22 @@ const connectRedis = async () => {
   }
 };
 
-// Set data to Redis
+// Set data to Redis with language support
 export const setCache = async (key: string, data: any, expiration = 3600) => {
   try {
+    // Format key with language if provided
+    // const languageKey = language ? `${key}:${language}` : key;
     await redisClient.setEx(key, expiration, JSON.stringify(data));
   } catch (error) {
     console.error("Redis cache set error:", error);
   }
 };
 
-// Get data from Redis
+// Get data from Redis with language support
 export const getCache = async (key: string) => {
   try {
+    // Format key with language if provided
+    // const languageKey = language ? `${key}:${language}` : key;
     const cachedData = await redisClient.get(key);
     if (cachedData) {
       return JSON.parse(cachedData);
@@ -48,18 +52,22 @@ export const getCache = async (key: string) => {
   }
 };
 
-// Delete cache by key
-export const deleteCache = async (key: string) => {
+// Delete cache by key with language support
+export const deleteCache = async (key: string, language?: string) => {
   try {
-    await redisClient.del(key);
+    // Format key with language if provided
+    const languageKey = language ? `${key}:${language}` : key;
+    await redisClient.del(languageKey);
   } catch (error) {
     console.error("Redis cache delete error:", error);
   }
 };
 
-// Clear cache with pattern
+// Clear cache with pattern with language support
 export const clearCache = async (pattern: string) => {
   try {
+    // Format pattern with language if provided
+    // const languagePattern = language ? `${pattern}:${language}` : pattern;
     const keys = await redisClient.keys(pattern);
     if (keys.length > 0) {
       await redisClient.del(keys);
@@ -67,6 +75,11 @@ export const clearCache = async (pattern: string) => {
   } catch (error) {
     console.error("Redis cache clear error:", error);
   }
+};
+
+// Generate a language-specific cache key
+export const generateCacheKey = (baseKey: string, language?: string): string => {
+  return language ? `${baseKey}:${language}` : baseKey;
 };
 
 export { connectRedis, redisClient };

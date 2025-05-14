@@ -1,0 +1,10 @@
+{
+  "welcome": "Chào mừng đến với API Danh mục Sản phẩm",
+  "productNotFound": "Không tìm thấy sản phẩm",
+  "productCreated": "Tạo sản phẩm thành công",
+  "serverError": "Lỗi máy chủ",
+  "allFieldsRequired": "Tất cả các trường là bắt buộc",
+  "priceValidation": "Giá phải là một số dương",
+  "productLiked": "Đã thích sản phẩm thành công",
+  "productUnliked": "Đã bỏ thích sản phẩm thành công"
+}
