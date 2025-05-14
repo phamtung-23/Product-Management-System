@@ -8,6 +8,8 @@ import { connectRedis, redisClient } from "./services/redisService";
 import initI18n from "./utils/i18n";
 import { i18nMiddleware } from "./middleware/i18nMiddleware";
 import i18next from 'i18next';
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './docs/swagger';
 
 // Load environment variables
 dotenv.config();
@@ -24,6 +26,8 @@ app.use(express.urlencoded({ extended: true }));
 // Initialize i18n
 const i18n = initI18n();
 app.use(i18nMiddleware);
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Simple route for testing
 app.get("/", (req: Request, res: Response) => {

@@ -132,7 +132,7 @@ To request responses in a specific language, use one of these methods:
    accept-language: vi
    ```
 
-2. Use the query parameter:
+<!-- 2. Use the query parameter:
    ```
    GET /api/products?lng=vi
    ```
@@ -140,4 +140,4 @@ To request responses in a specific language, use one of these methods:
 3. Set an i18next cookie:
    ```
    i18next=vi
-   ```
+   ``` -->

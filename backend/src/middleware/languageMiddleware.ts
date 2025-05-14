@@ -5,7 +5,7 @@ export const languageDetector = (req: Request, res: Response, next: NextFunction
   let language = 'en';
   
   // Check if Accept-Language header exists
-  const acceptLanguage = req.headers['accept-language'];
+  const acceptLanguage = req.headers['Accept-Language'];
   
   if (acceptLanguage) {
     // If vi (Vietnamese) is preferred, use it
