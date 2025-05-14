@@ -1,5 +1,6 @@
-import { RequestHandler } from 'express';
-import Product, { IProduct } from '../models/Product';
+import { RequestHandler } from "express";
+import Product, { IProduct } from "../models/Product";
+import { clearCache } from "../services/redisService";
 
 // Get products with pagination
 export const getProducts: RequestHandler = async (req, res) => {
@@ -8,9 +9,7 @@ export const getProducts: RequestHandler = async (req, res) => {
     const limit = parseInt(req.query.limit as string) || 10;
     const skip = (page - 1) * limit;
 
-    const products = await Product.find()
-      .skip(skip)
-      .limit(limit);
+    const products = await Product.find().skip(skip).limit(limit);
 
     const total = await Product.countDocuments();
     const totalPages = Math.ceil(total / limit);
@@ -21,11 +20,11 @@ export const getProducts: RequestHandler = async (req, res) => {
         currentPage: page,
         totalPages,
         totalItems: total,
-        itemsPerPage: limit
-      }
+        itemsPerPage: limit,
+      },
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: "Server error", error });
   }
 };
 
@@ -36,13 +35,13 @@ export const createProduct: RequestHandler = async (req, res) => {
 
     // Basic validation
     if (!name || !price || !category || !subcategory) {
-      res.status(400).json({ message: 'All fields are required' });
+      res.status(400).json({ message: "All fields are required" });
       return;
     }
 
     // Validate price
     if (isNaN(price) || price <= 0) {
-      res.status(400).json({ message: 'Price must be a positive number' });
+      res.status(400).json({ message: "Price must be a positive number" });
       return;
     }
 
@@ -52,13 +51,16 @@ export const createProduct: RequestHandler = async (req, res) => {
       category,
       subcategory,
       likes: 0,
-      likedBy: []
+      likedBy: [],
     });
-
     const savedProduct = await newProduct.save();
+
+    // Invalidate products cache after creating a new product
+    await clearCache("products:*");
+
     res.status(201).json(savedProduct);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: "Server error", error });
   }
 };
 
@@ -66,9 +68,9 @@ export const createProduct: RequestHandler = async (req, res) => {
 export const searchProducts: RequestHandler = async (req, res) => {
   try {
     const query = req.query.q as string;
-    
+
     if (!query) {
-      res.status(400).json({ message: 'Search query is required' });
+      res.status(400).json({ message: "Search query is required" });
       return;
     }
 
@@ -77,13 +79,15 @@ export const searchProducts: RequestHandler = async (req, res) => {
     const skip = (page - 1) * limit;
 
     // Search using text index or regex
-    const products = await Product.find(
-      { name: { $regex: query, $options: 'i' } }
-    )
+    const products = await Product.find({
+      name: { $regex: query, $options: "i" },
+    })
       .skip(skip)
       .limit(limit);
 
-    const total = await Product.countDocuments({ name: { $regex: query, $options: 'i' } });
+    const total = await Product.countDocuments({
+      name: { $regex: query, $options: "i" },
+    });
     const totalPages = Math.ceil(total / limit);
 
     res.status(200).json({
@@ -92,10 +96,10 @@ export const searchProducts: RequestHandler = async (req, res) => {
         currentPage: page,
         totalPages,
         totalItems: total,
-        itemsPerPage: limit
-      }
+        itemsPerPage: limit,
+      },
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: "Server error", error });
   }
 };

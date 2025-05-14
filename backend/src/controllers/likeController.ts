@@ -1,6 +1,7 @@
-import { RequestHandler } from 'express';
-import mongoose from 'mongoose';
-import Product from '../models/Product';
+import { RequestHandler } from "express";
+import mongoose from "mongoose";
+import Product from "../models/Product";
+import { clearCache } from "../services/redisService";
 
 export const toggleLike: RequestHandler = async (req, res) => {
   try {
@@ -9,7 +10,7 @@ export const toggleLike: RequestHandler = async (req, res) => {
 
     // Validate product ID
     if (!mongoose.Types.ObjectId.isValid(productId)) {
-      res.status(400).json({ message: 'Invalid product ID' });
+      res.status(400).json({ message: "Invalid product ID" });
       return;
     }
 
@@ -17,14 +18,12 @@ export const toggleLike: RequestHandler = async (req, res) => {
     const product = await Product.findById(productId);
 
     if (!product) {
-      res.status(404).json({ message: 'Product not found' });
+      res.status(404).json({ message: "Product not found" });
       return;
     }
 
     // Check if user has already liked the product
-    const alreadyLiked = product.likedBy.some(
-      (id) => id.toString() === userId
-    );
+    const alreadyLiked = product.likedBy.some((id) => id.toString() === userId);
 
     let update;
     let message;
@@ -33,30 +32,29 @@ export const toggleLike: RequestHandler = async (req, res) => {
       // Unlike: Remove user ID from likedBy array and decrement likes count
       update = {
         $pull: { likedBy: userId },
-        $inc: { likes: -1 }
+        $inc: { likes: -1 },
       };
-      message = 'Product unliked successfully';
+      message = "Product unliked successfully";
     } else {
       // Like: Add user ID to likedBy array and increment likes count
       update = {
         $addToSet: { likedBy: userId },
-        $inc: { likes: 1 }
+        $inc: { likes: 1 },
       };
-      message = 'Product liked successfully';
-    }
+      message = "Product liked successfully";
+    } // Update the product
+    const updatedProduct = await Product.findByIdAndUpdate(productId, update, {
+      new: true,
+    });
 
-    // Update the product
-    const updatedProduct = await Product.findByIdAndUpdate(
-      productId,
-      update,
-      { new: true }
-    );
+    // Invalidate products cache after toggling like/unlike
+    await clearCache("products:*");
 
     res.status(200).json({
       message,
-      product: updatedProduct
+      product: updatedProduct,
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: "Server error", error });
   }
 };

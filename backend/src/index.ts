@@ -2,8 +2,9 @@ import dotenv from "dotenv";
 import express, { Request, Response } from "express";
 import cors from "cors";
 import mongoose, { ConnectOptions } from "mongoose";
-import authRoutes from './routes/authRoutes';
-import productRoutes from './routes/productRoutes';
+import authRoutes from "./routes/authRoutes";
+import productRoutes from "./routes/productRoutes";
+import { connectRedis, redisClient } from "./services/redisService";
 
 // Load environment variables
 dotenv.config();
@@ -23,18 +24,22 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 // Use auth routes
-app.use('/auth', authRoutes);
+app.use("/auth", authRoutes);
 
 // Use product routes
-app.use('/products', productRoutes);
+app.use("/products", productRoutes);
 
-// Connect to MongoDB
+// Connect to MongoDB and Redis
 mongoose
-  .connect(process.env.MONGODB_URI || "mongodb://localhost:27017/product-catalog", {
-  } as ConnectOptions)
-  .then(() => {
+  .connect(
+    process.env.MONGODB_URI || "mongodb://localhost:27017/product-catalog",
+    {} as ConnectOptions
+  )
+  .then(async () => {
     console.log("Connected to MongoDB");
-    // Start server after successful DB connection
+    // Connect to Redis
+    await connectRedis();
+    // Start server after successful connections
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });
@@ -48,11 +53,13 @@ mongoose
 process.on("SIGINT", async () => {
   console.log("Shutting down gracefully...");
   await mongoose.connection.close();
+  await redisClient.quit();
   process.exit(0);
 });
 
 process.on("SIGTERM", async () => {
   console.log("Shutting down gracefully...");
   await mongoose.connection.close();
+  await redisClient.quit();
   process.exit(0);
 });
