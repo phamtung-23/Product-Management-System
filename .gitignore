@@ -1,0 +1,62 @@
+# Backend application (Node.js)
+backend/build/
+backend/dist/
+backend/.cache/
+backend/.tmp/
+backend/public/uploads/*
+backend/package-lock.json
+backend/node_modules/
+
+# Frontend application (React,js)
+frontend/build/
+frontend/dist/
+frontend/.cache/
+frontend/.tmp/
+frontend/public/uploads/*
+frontend/package-lock.json
+frontend/node_modules/
+
+
+# Environment variables
+.env
+!.env.example
+
+# Docker
+.docker/data
+docker-init.dockerfile
+*.tar
+*.gz
+*.env.local
+*.env.development.local
+*.env.test.local
+*.env.production.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.sublime-project
+*.sublime-workspace
+
+# Testing
+/coverage
+/.nyc_output
+/coverage-report
+
+# Logs
+logs
+*.log
+
+# Temporary files
+tmp/
+temp/
+
+REQUIREMENT.md
+TASK.md
