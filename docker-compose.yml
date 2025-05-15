@@ -47,11 +47,12 @@ services:
       - ./frontend:/app
       - /app/node_modules
     ports:
-      - "3001:3000"
+      - "5173:5173"
+    depends_on:
+      - backend
     environment:
       - NODE_ENV=development
       - CHOKIDAR_USEPOLLING=true
-    command: sh -c "npm install && npm start"
 
 volumes:
   mongodb_data:
