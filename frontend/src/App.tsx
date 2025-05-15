@@ -8,6 +8,7 @@ import {
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
+import CreateProduct from "./pages/CreateProduct";
 import AuthGuard from "./components/AuthGuard";
 
 function App() {
@@ -36,6 +37,14 @@ function App() {
             element={
               <AuthGuard requireAuth={true}>
                 <Home />
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/create-product"
+            element={
+              <AuthGuard requireAuth={true}>
+                <CreateProduct />
               </AuthGuard>
             }
           />

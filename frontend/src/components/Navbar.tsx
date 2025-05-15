@@ -51,6 +51,9 @@ const Navbar: React.FC = () => {
             <Button color="inherit" component={RouterLink} to="/">
               Products
             </Button>
+            <Button color="inherit" component={RouterLink} to="/create-product">
+              Add Product
+            </Button>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <Typography variant="body1" sx={{ mr: 2 }}>
                 {user?.username || user?.email}

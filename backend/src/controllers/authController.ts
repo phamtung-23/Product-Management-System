@@ -1,9 +1,9 @@
-import { Request, Response, RequestHandler } from 'express';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import User, { IUser } from '../models/User';
+import { Request, Response, RequestHandler } from "express";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import User, { IUser } from "../models/User";
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
+const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
 
 // Register a new user
 export const register: RequestHandler = async (req, res) => {
@@ -13,7 +13,7 @@ export const register: RequestHandler = async (req, res) => {
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      res.status(400).json({ message: 'User already exists' });
+      res.status(400).json({ message: "User already exists" });
       return;
     }
 
@@ -24,9 +24,9 @@ export const register: RequestHandler = async (req, res) => {
     const newUser: IUser = new User({ username, email, passwordHash });
     await newUser.save();
 
-    res.status(201).json({ message: 'User registered successfully' });
+    res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: "Server error", error });
   }
 };
 
@@ -38,22 +38,27 @@ export const login: RequestHandler = async (req, res) => {
     // Find the user by email
     const user = await User.findOne({ email });
     if (!user) {
-      res.status(400).json({ message: 'Invalid credentials' });
+      res.status(400).json({ message: "Invalid credentials" });
       return;
     }
 
     // Compare the password
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) {
-      res.status(400).json({ message: 'Invalid credentials' });
+      res.status(400).json({ message: "Invalid credentials" });
       return;
     }
 
     // Generate a JWT token
-    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "1h" });
 
-    res.status(200).json({ token });
+    res
+      .status(200)
+      .json({
+        token,
+        user: { id: user._id, email: user.email, username: user.username },
+      });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: "Server error", error });
   }
 };
