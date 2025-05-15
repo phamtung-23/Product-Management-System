@@ -16,7 +16,8 @@ import {
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { useAuth } from "../context/useAuth";
-import { getProducts, toggleLikeProduct } from "../api/products";
+import { useProducts } from "../hooks/useProducts";
+import { toggleLikeProduct } from "../api/products";
 import type { Product, PaginatedResponse } from "../api/products";
 import { useNavigate } from "react-router-dom";
 
@@ -35,33 +36,36 @@ const ProductListing: React.FC<ProductListingProps> = ({ searchResults }) => {
   const [likeInProgress, setLikeInProgress] = useState<string | null>(null); // Track which product is being liked
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+  // React Query for products
+  const {
+    data: queryData,
+    isLoading: queryLoading,
+    isError: queryError,
+    refetch: refetchProducts,
+  } = useProducts(page, limit);
+
   useEffect(() => {
     if (searchResults) {
       setProducts(searchResults.data);
       setTotalPages(searchResults.totalPages);
       setPage(searchResults.page);
       setLoading(false);
-    } else {
-      fetchProducts();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchResults, page, limit]);
-  const fetchProducts = async () => {
-    try {
+    } else if (queryData) {
+      setProducts(queryData.data);
+      setTotalPages(queryData.totalPages);
+      setLoading(false);
+    } else if (queryLoading) {
       setLoading(true);
-      const response = await getProducts(page, limit);
-      console.log("Fetched products:", response);
-      if (response && response.data) {
-        setProducts(response.data);
-        setTotalPages(response.totalPages || 1);
-        setError(null);
-      }
-    } catch (err) {
-      console.error("Error fetching products:", err);
+    } else if (queryError) {
       setError("Failed to load products. Please try again later.");
-    } finally {
       setLoading(false);
     }
+  }, [searchResults, queryData, queryLoading, queryError]);
+
+  const fetchProducts = async () => {
+    // Use refetch from React Query
+    refetchProducts();
   };
 
   const handlePageChange = (
