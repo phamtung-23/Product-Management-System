@@ -1,7 +1,9 @@
 services:
-  app:
+  backend:
     build:
       context: .
+      dockerfile: Dockerfile.backend
+      target: dev
     ports:
       - "3000:3000"
     volumes:
@@ -35,6 +37,21 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      target: dev
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+    command: sh -c "npm install && npm start"
 
 volumes:
   mongodb_data:
