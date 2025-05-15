@@ -12,9 +12,12 @@ import {
 } from '@mui/material';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
+import { useLanguage } from '../context/LanguageContext';
+import LanguageSwitcher from './LanguageSwitcher';
 
 const Navbar: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
+  const { translate } = useLanguage();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   
@@ -36,24 +39,25 @@ const Navbar: React.FC = () => {
     // Future implementation for profile page
     handleClose();
   };
-
   return (
     <AppBar position="static">
       <Toolbar>
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           <RouterLink to="/" style={{ color: 'white', textDecoration: 'none' }}>
-            Product Management
+            {translate('app.title')}
           </RouterLink>
         </Typography>
         
         {isAuthenticated ? (
           <>
             <Button color="inherit" component={RouterLink} to="/">
-              Products
+              {translate('nav.products')}
             </Button>
             <Button color="inherit" component={RouterLink} to="/create-product">
-              Add Product
+              {translate('nav.addProduct')}
             </Button>
+            {/* Add language switcher */}
+            <LanguageSwitcher />
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <Typography variant="body1" sx={{ mr: 2 }}>
                 {user?.username || user?.email}
@@ -85,19 +89,21 @@ const Navbar: React.FC = () => {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
               >
-                <MenuItem onClick={handleProfile}>Profile</MenuItem>
-                <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                <MenuItem onClick={handleProfile}>{translate('nav.profile')}</MenuItem>
+                <MenuItem onClick={handleLogout}>{translate('nav.logout')}</MenuItem>
               </Menu>
             </Box>
           </>
         ) : (
           <>
             <Button color="inherit" component={RouterLink} to="/login">
-              Login
+              {translate('nav.login')}
             </Button>
             <Button color="inherit" component={RouterLink} to="/register">
-              Register
+              {translate('nav.register')}
             </Button>
+            {/* Add language switcher even for non-authenticated users */}
+            <LanguageSwitcher />
           </>
         )}
       </Toolbar>

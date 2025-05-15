@@ -7,6 +7,7 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
+import { useLanguage } from '../context/LanguageContext';
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
@@ -15,6 +16,7 @@ interface SearchBarProps {
 
 const SearchBar: React.FC<SearchBarProps> = ({ onSearch, initialQuery = '' }) => {
   const [searchQuery, setSearchQuery] = useState<string>(initialQuery);
+  const { translate } = useLanguage();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,7 +41,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, initialQuery = '' }) =>
     >
       <TextField
         fullWidth
-        placeholder="Search products..."
+        placeholder={translate('search.placeholder')}
         variant="outlined"
         size="small"
         value={searchQuery}

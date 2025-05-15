@@ -16,6 +16,7 @@ import {
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { useAuth } from "../context/useAuth";
+import { useLanguage } from "../context/LanguageContext";
 import { useProducts } from "../hooks/useProducts";
 import { toggleLikeProduct } from "../api/products";
 import type { Product, PaginatedResponse } from "../api/products";
@@ -35,6 +36,7 @@ const ProductListing: React.FC<ProductListingProps> = ({ searchResults }) => {
   const [totalPages, setTotalPages] = useState<number>(0);
   const [likeInProgress, setLikeInProgress] = useState<string | null>(null); // Track which product is being liked
   const { user, isAuthenticated } = useAuth();
+  const { translate, language } = useLanguage();
   const navigate = useNavigate();
 
   // React Query for products
@@ -62,6 +64,11 @@ const ProductListing: React.FC<ProductListingProps> = ({ searchResults }) => {
       setLoading(false);
     }
   }, [searchResults, queryData, queryLoading, queryError]);
+
+  // Refetch products when language changes
+  useEffect(() => {
+    refetchProducts();
+  }, [language, refetchProducts]);
 
   const fetchProducts = async () => {
     // Use refetch from React Query
@@ -202,23 +209,29 @@ const ProductListing: React.FC<ProductListingProps> = ({ searchResults }) => {
                   variant="body2"
                   sx={{ mb: 1 }}
                 >
-                  ${product.price.toFixed(2)}
+                  {translate('product.price')}: ${product.price.toFixed(2)}
                 </Typography>
                 <Divider sx={{ my: 1 }} />
                 <Box sx={{ display: "flex", gap: 1, my: 1, flexWrap: "wrap" }}>
                   <Chip
-                    label={product.category}
+                    label={translate('product.category') + ': ' + product.category}
                     size="small"
                     color="primary"
                     variant="outlined"
                   />
                   <Chip
-                    label={product.subcategory}
+                    label={translate('product.subcategory') + ': ' + product.subcategory}
                     size="small"
                     color="secondary"
                     variant="outlined"
                   />
                 </Box>
+                <Typography variant="caption" color="textSecondary">
+                  {translate('product.category')}: {product.category}
+                </Typography>
+                <Typography variant="caption" color="textSecondary" display="block">
+                  {translate('product.subcategory')}: {product.subcategory}
+                </Typography>
               </CardContent>
               <CardActions
                 sx={{ justifyContent: "space-between", px: 2, pb: 2 }}
@@ -250,7 +263,7 @@ const ProductListing: React.FC<ProductListingProps> = ({ searchResults }) => {
                     {product.likes}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    {product.likes === 1 ? "like" : "likes"}
+                    {translate('product.likes')}
                   </Typography>
                 </Box>
                 <IconButton
@@ -299,11 +312,10 @@ const ProductListing: React.FC<ProductListingProps> = ({ searchResults }) => {
             </Card>
           </Grid>
         ))}
-
         {products && products.length === 0 && !loading && (
           <Grid size={12}>
             <Box sx={{ textAlign: "center", py: 5 }}>
-              <Typography variant="h6">No products found</Typography>
+              <Typography variant="h6">{translate('product.noProductsFound') || 'No products found'}</Typography>
             </Box>
           </Grid>
         )}
