@@ -9,6 +9,15 @@ export interface AuthResponse {
   };
 }
 
+export interface AuthStatusResponse {
+  isAuthenticated: boolean;
+  user: {
+    id: string;
+    email: string;
+    username: string;
+  };
+}
+
 export interface LoginPayload {
   email: string;
   password: string;
@@ -29,5 +38,10 @@ export const register = async (
   payload: RegisterPayload
 ): Promise<AuthResponse> => {
   const { data } = await api.post("/auth/register", payload);
+  return data;
+};
+
+export const checkAuthStatus = async (): Promise<AuthStatusResponse> => {
+  const { data } = await api.get("/auth/status");
   return data;
 };

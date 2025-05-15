@@ -62,3 +62,24 @@ export const login: RequestHandler = async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 };
+
+// Check authentication status
+export const checkAuthStatus: RequestHandler = async (req, res) => {
+  try {
+    // User is already verified by the authenticateToken middleware
+    // Just return the user data
+    const user = await User.findById(req.user.id).select('-passwordHash');
+    
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+    
+    res.status(200).json({ 
+      isAuthenticated: true,
+      user: { id: user._id, email: user.email, username: user.username }
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};

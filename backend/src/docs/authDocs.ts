@@ -77,3 +77,87 @@
  *       400:
  *         description: Invalid credentials
  */
+
+/**
+ * @swagger
+ * /auth/status:
+ *   get:
+ *     summary: Check authentication status
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: header
+ *         name: Accept-Language
+ *         schema:
+ *           type: string
+ *           enum: [en, vi]
+ *         description: Preferred response language (en or vi)
+ *         required: false
+ *     responses:
+ *       200:
+ *         description: Returns authentication status and user data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 isAuthenticated:
+ *                   type: boolean
+ *                   example: true
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     username:
+ *                       type: string
+ *       401:
+ *         description: Unauthorized, invalid or missing token
+ *       404:
+ *         description: User not found
+ */
+
+/**
+ * @swagger
+ * /auth/status:
+ *   get:
+ *     summary: Check authentication status
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: header
+ *         name: Accept-Language
+ *         schema:
+ *           type: string
+ *           enum: [en, vi]
+ *         description: Preferred response language (en or vi)
+ *         required: false
+ *     responses:
+ *       200:
+ *         description: Returns authentication status and user data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 isAuthenticated:
+ *                   type: boolean
+ *                   example: true
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     username:
+ *                       type: string
+ *       401:
+ *         description: Unauthorized, invalid or missing token
+ *       404:
+ *         description: User not found
+ */
