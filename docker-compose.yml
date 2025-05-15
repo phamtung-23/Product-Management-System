@@ -12,17 +12,19 @@ services:
     depends_on:
       - mongodb
       - redis
-    environment:
-      - NODE_ENV=development
-      - PORT=3000
-      - MONGODB_URI=mongodb://mongodb:27017/product-catalog
-      - JWT_SECRET=your_jwt_secret_key_change_in_production
-      - JWT_EXPIRES_IN=7d
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - REDIS_TTL=3600
-      - CHOKIDAR_USEPOLLING=true
+    env_file:
+      - .env
     command: npm run dev
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: ${PORT:-3000}
+      MONGODB_URI: ${MONGODB_URI:-mongodb://mongodb:27017/product-catalog}
+      JWT_SECRET: ${JWT_SECRET:-your_jwt_secret_key_change_in_production}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_TTL: ${REDIS_TTL:-3600}
+      CHOKIDAR_USEPOLLING: ${CHOKIDAR_USEPOLLING:-true}
 
   mongodb:
     image: mongo:7.0.8
@@ -50,9 +52,12 @@ services:
       - "5173:5173"
     depends_on:
       - backend
+    env_file:
+      - .env
     environment:
-      - NODE_ENV=development
-      - CHOKIDAR_USEPOLLING=true
+      NODE_ENV: ${NODE_ENV:-development}
+      CHOKIDAR_USEPOLLING: ${CHOKIDAR_USEPOLLING:-true}
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:3000}
 
 volumes:
   mongodb_data:
