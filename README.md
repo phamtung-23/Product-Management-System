@@ -42,9 +42,9 @@ This project is a full-stack application with a Node.js/TypeScript backend and a
    ```sh
    docker-compose up --build
    ```
-4. Access the frontend at [http://localhost:3000](http://localhost:3000)
-5. Access the backend API at [http://localhost:4000](http://localhost:4000)
-6. Swagger API docs: [http://localhost:4000/api-docs](http://localhost:4000/api-docs)
+4. Access the frontend at [http://localhost:5173](http://localhost:5173)
+5. Access the backend API at [http://localhost:3000](http://localhost:3000)
+6. Swagger API docs: [http://localhost:3000/api-docs](http://localhost:3000/api-docs)
 
 ### Local Development (without Docker)
 - Backend:
